@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+!/usr/bin/env python
 import rospy
 import time
 import numpy as np
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
 
-class Follow_Wall():
+class right():
 
     def __init__(self):
         
@@ -98,10 +98,11 @@ class Follow_Wall():
         else:
             self.velCoeff = 1
 
-        print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
-        print("Angle = {}".format(self.output))
+        #print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
+        #print("Angle = {}".format(self.output))
 
-        print("SALIENDO DE PID")
+        #print("SALIENDO DE PID")
+	print("right")
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
 
@@ -111,7 +112,8 @@ class Follow_Wall():
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
         
+        
 if __name__ == "__main__":
-    rospy.init_node("Follow_Wall")
-    node = Follow_Wall()
-rospy.spin()
+    rospy.init_node("right", anonymous = True)
+    node = right()
+    rospy.spin()
