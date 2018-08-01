@@ -15,7 +15,7 @@ class ar_switch():
         #rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback,  queue_size = 1)
 
     def callback(self,marker):
-        if len(marker.marcookers) > 0:
+        if len(marker.markers) > 0:
             if marker.markers[0].pose.x != None:
          	print marker.markers[0].pose.x
 
