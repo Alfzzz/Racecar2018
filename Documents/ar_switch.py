@@ -16,12 +16,13 @@ class ar_switch():
 
     def callback(self,marker):
         if len(marker.markers) > 0:
-            if marker.markers[0].id == 3:
-         	go.go()
+            if marker.markers.id != None:
+                if marker.markers[0].id == 3:
+                go.go()
 
-            if marker.markers[0].id == 4:
-                stop.stop()
-                   
+                if marker.markers[0].id == 4:
+                    stop.stop()
+
 
 if __name__ == "__main__":
     rospy.init_node("ar_switch", anonymous = True)
