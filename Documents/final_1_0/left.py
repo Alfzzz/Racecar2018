@@ -5,7 +5,7 @@ import numpy as np
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
 
-class Follow_Wall():
+class left():
 
     def __init__(self):
         
@@ -99,10 +99,11 @@ class Follow_Wall():
         else:
             self.velCoeff = 1
 
-        print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
-        print("Angle = {}".format(self.output))
+        #print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
+        #print("Angle = {}".format(self.output))
         
-        print("SALIENDO PID")
+        #print("SALIENDO PID")
+	print("left")
 
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
@@ -113,6 +114,6 @@ class Follow_Wall():
         self.cmd_pub.publish(msg)
         
 if __name__ == "__main__":
-    rospy.init_node("Follow_Wall")
-    node = Follow_Wall()
-rospy.spin()
+    rospy.init_node("left", anonymous = True)
+    node = left()
+    rospy.spin()
