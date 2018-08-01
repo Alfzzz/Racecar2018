@@ -13,10 +13,6 @@ class Potential_Field_Controller():
         self.k = 0.1
         self.ks = 0.1
 
-	self.speed = self.ks * (self.x**2+self.y**2)**1/2
-        self.phi = np.arctan2(self.y,self.x)
-        self.steer = self.mapping(self.phi)
-
         rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
 
@@ -42,12 +38,12 @@ class Potential_Field_Controller():
 
 
     def theta(self,shot):
-        result = self.translate(shot, 1, 1081, -0.785398, 3.92699)
+        result = self.translate(shot, 0, 1080, -0.785398, 3.92699)
         return result
 
     def mapping(self, temp):
         if temp >= np.pi-0.34 and temp <= np.pi+0.34:
-            self.steeting = self.translate(temp, np.pi-0.34, np.pi+0.34, -0.34, 0.34)
+            self.steering = self.translate(temp, np.pi-0.34, np.pi+0.34, -0.34, 0.34)
         elif temp > np.pi+0.34 and temp < (3*np.pi)/2:
             self.steering =  1
         elif temp >= (3*np.pi)/2 and temp < np.pi-0.34:
@@ -57,8 +53,12 @@ class Potential_Field_Controller():
 
             
     def ackermann_cmd_input_callback(self, msg):
+	self.speed = self.ks * (self.x**2+self.y**2)**1/2
+        self.phi = np.arctan2(self.y,self.x)
+        self.steering = self.mapping(self.phi)
+	
         msg.drive.speed = self.speed
-        msg.drive.steering_angle = self.steer
+        msg.drive.steering_angle = self.steering
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
         print self.phi
