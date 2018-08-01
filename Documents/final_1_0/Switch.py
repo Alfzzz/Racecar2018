@@ -16,7 +16,7 @@ class ar_switch():
             if marker.markers[0].id == 1:
          	    Right.Follow_Wall()
 
-            if marker.markers[0].id == 4:
+            elif marker.markers[0].id == 4:
                 Left.Follow_Wall()
                    
 
