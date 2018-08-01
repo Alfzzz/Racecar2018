@@ -52,7 +52,7 @@ class Potential_Field_Controller():
 
 
             
-    def ackermann_cmd_input_callback(self, msg):
+    def ackermann_cmd_input_callback(self,msg):
 	self.speed = self.ks * (self.x**2+self.y**2)**1/2
         self.phi = np.arctan2(self.y,self.x)
         self.steering = self.mapping(self.phi)
