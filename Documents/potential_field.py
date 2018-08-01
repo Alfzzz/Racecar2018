@@ -13,22 +13,16 @@ class Potential_Field_Controller():
         self.k = 0.1
         self.ks = 0.1
 
+	self.speed = self.ks * (self.x**2+self.y**2)**1/2
+        self.phi = np.atan2(self.y,self.x)
+        self.steer = mapping(self.phi)
+
         rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
 
         self.cmd_pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size = 10)
 
-    def laser_callback(self,msg):
-        self.angle = 0
-        self.x = 0
-        self.y = 100
-        for i in range(0,len(msg.ranges)):
-            force = self.k/msg.ranges[i]**2
-            self.x -= force*np.cos(theta(i))
-            self.y -= force*np.sin(theta(i))
-
-
-    def translate(value, leftMin, leftMax, rightMin, rightMax):
+    def translate(self,value, leftMin, leftMax, rightMin, rightMax):
         # Figure out how 'wide' each range is
         leftSpan = leftMax - leftMin
         rightSpan = rightMax - rightMin
@@ -37,24 +31,29 @@ class Potential_Field_Controller():
         # Convert the 0-1 range into a value in the right range.
         return rightMin + (valueScaled * rightSpan)
 
-    def theta(shot):
-        result = transate(shot, 1, 1081, -0.785398, 3.92699)
+    def laser_callback(self,msg):
+        self.angle = 0
+        self.x = 0
+        self.y = 100
+        for i in range(0,len(msg.ranges)):
+            force = self.k/msg.ranges[i]**2
+            self.x -= force*np.cos(self.theta(i))
+            self.y -= force*np.sin(self.theta(i))
+
+
+    def theta(self,shot):
+        result = self.translate(shot, 1, 1081, -0.785398, 3.92699)
         return result
 
     def mapping(self, temp):
         if temp >= np.pi-0.34 and temp <= np.pi+0.34:
-            self.steeting = translate(temp, np.pi-0.34, np.pi+0.34, -0.34, 0.34)
+            self.steeting = self.translate(temp, np.pi-0.34, np.pi+0.34, -0.34, 0.34)
         elif temp > np.pi+0.34 and temp < (3*np.pi)/2:
             self.steering =  1
         elif temp >= (3*np.pi)/2 and temp < np.pi-0.34:
             self.steering = -1
         return self.steering
 
-
-    def callback(self):
-    self.speed = self.ks * (self.x**2+self.y**2)**1/2
-    self.phi = np.atan2(self.y,self.x)
-    self.steer = mapping(self.phi)
 
             
     def ackermann_cmd_input_callback(self, msg):
@@ -65,7 +64,8 @@ class Potential_Field_Controller():
         print self.phi
         
 if __name__ == "__main__":
-    rospy.init_node("Follow_Wall")
-    node = Follow_Wall()
-rospy.spin()
+    rospy.init_node("Potential_Field_Controller")
+    node = Potential_Field_Controller()
+    rospy.spin()
+
 
