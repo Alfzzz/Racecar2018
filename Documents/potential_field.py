@@ -14,8 +14,8 @@ class Potential_Field_Controller():
         self.ks = 0.1
 
 	self.speed = self.ks * (self.x**2+self.y**2)**1/2
-        self.phi = np.atan2(self.y,self.x)
-        self.steer = mapping(self.phi)
+        self.phi = np.arctan2(self.y,self.x)
+        self.steer = self.mapping(self.phi)
 
         rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
@@ -67,5 +67,3 @@ if __name__ == "__main__":
     rospy.init_node("Potential_Field_Controller")
     node = Potential_Field_Controller()
     rospy.spin()
-
-
