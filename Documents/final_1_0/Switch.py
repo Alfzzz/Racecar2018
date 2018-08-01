@@ -14,13 +14,13 @@ class ar_switch():
         self.master = 0
 
     def callback(self,marker):
-        if (len(marker.markers) > 0) and:
+        if (lenmarker.markers) > 0:
             if marker.markers.id != None:
                 print(marker.markers[0].id)
+                
                 if marker.markers[0].id == 1:
                     right.right()
-
-
+                    
                 elif marker.markers[0].id == 4:
                     left.left()
                 else:
