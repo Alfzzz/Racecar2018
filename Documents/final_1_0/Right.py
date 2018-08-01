@@ -14,7 +14,7 @@ class Follow_Wall():
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
  
         #::::::::::::::::::::::::::::::::::::: PUBLISHERS ::::::::::::::::::::::::::::::::::
-        self.cmd_pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size = 10)
+        self.cmd_pub = rospy.Publisher('/ackermann_cmd_mux/input/default', AckermannDriveStamped, queue_size = 10)
 
 
         self.maxSpeed = 1
