@@ -41,19 +41,25 @@ class Potential_Field_Controller():
         result = transate(shot, 1, 1081, -0.785398, 3.92699)
         return result
 
-    def mapping(temp):
-        steeting = translate(temp, 0, 6.28319, -0.34, 0.34)
+    def mapping(self, temp):
+        if temp >= np.pi-0.34 and temp <= np.pi+0.34:
+            self.steeting = translate(temp, np.pi-0.34, np.pi+0.34, -0.34, 0.34)
+        elif temp > np.pi+0.34 and temp < (3*np.pi)/2:
+            self.steering =  1
+        elif temp >= (3*np.pi)/2 and temp < np.pi-0.34:
+            self.steering = -1
+        return self.steering
 
 
     def callback(self):
     self.speed = self.ks * (self.x**2+self.y**2)**1/2
     self.phi = np.atan2(self.y,self.x)
-    #self.steer = mapping(self.phi)
+    self.steer = mapping(self.phi)
 
             
     def ackermann_cmd_input_callback(self, msg):
         msg.drive.speed = self.speed
-        msg.drive.steering_angle = self.phi
+        msg.drive.steering_angle = self.steer
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
         print self.phi
@@ -62,3 +68,4 @@ if __name__ == "__main__":
     rospy.init_node("Follow_Wall")
     node = Follow_Wall()
 rospy.spin()
+
