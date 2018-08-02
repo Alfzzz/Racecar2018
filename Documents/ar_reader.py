@@ -4,20 +4,20 @@ import rospy
 from ar_track_alvar_msgs.msg import AlvarMarkers
 
 AR_TOPIC = "/ar_pose_marker"
-
+flag = None
 def ar_callback(ar_markers):
+    global flag
     #for marker in ar_markers.markers:
         #ar_id = marker.id
         #marker.pose.pose.position.y
         #last_id = ar_id
-    flag = 0
-    if len(ar_markers.markers) >= 1:
+    if len(ar_markers.markers) > 1:
         for i in range(1, len(ar_markers.markers)):
             minimum = ar_markers.markers[0].id
             if ar_markers.markers[i].pose.pose.position.y < minimum:
                 minimum = ar_markers.markers[i].id
-                flag = 1
-        	last_ar = minimum
+        flag = 1
+        last_ar = minimum
     elif len(ar_markers.markers) == 1:
         minimum = ar_markers.markers[0].id
         flag = 1
@@ -25,9 +25,10 @@ def ar_callback(ar_markers):
     else:
         pass
 
-    if flag == 0:
+
+    if flag = None:
         minimum = 0
-    else: 
+    else:
         minimum = last_ar
     print minimum
 
