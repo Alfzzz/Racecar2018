@@ -16,7 +16,7 @@ class ar_switch():
         rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.callback, queue_size = 1)
         #rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback,  queue_size = 1)
- 
+        rospy.Subscriber("/scan", laser_callback, self.laser_callback)
         #::::::::::::::::::::::::::::::::::::: PUBLISHERS ::::::::::::::::::::::::::::::::::
         self.cmd_pub = rospy.Publisher('/ackermann_cmd_mux/input/default', AckermannDriveStamped, queue_size = 10)
         self.maxSpeed = 1
@@ -37,45 +37,39 @@ class ar_switch():
         self.output = 0
         self.current_time = time.time() #No estpy seguro pero nos puede ayudar en un futuro
         self.prev_time = 0
-
+        
+        global self.wall
+        
     def callback(self,marker):
+        self.id = marker.markers[0].id
         if (len(marker.markers) > 0) and:
             if marker.markers.id != None:
                 print(marker.markers[0].id)
                 if marker.markers[0].id == 1:
-                    rospy.Subscriber("/scan", left_callback, self.laser_callback)
+                    self.wall="right"               
                 elif marker.markers[0].id == 4:
-                    rospy.Subscriber("/scan", right_callback, self.laser_callback)
-                else:
-                    pass
-                    
-    def left_callback(self,msg):
+                    self.wall="left"
+    def laser_callback(self,msg):
         
         ranges = msg.ranges
-
-        #Right average
-        self.futureL = np.mean(ranges[600: 740])
-        print("future L = {}".format(self.futureL)) ####
-        self.averageL = np.mean(ranges[740 : 900])
-        print("average L = {}".format(self.averageL))
-        #Front average
-        self.wall = np.mean(ranges[480 : 600])
-
-        self.left_PID(1.0, 1.2, 0.0, 0.4, 'Left')
-        
-    def right_callback(self,msg):
-        
-        ranges = msg.ranges
-
-        #Right average
-        self.averageR = np.mean(ranges[180 : 340])
-        print("future R = {}".format(self.futureR))
-        self.futureR = np.mean(ranges[340 : 480])
-        print("average R = {}".format(self.averageR))
-        #Front average
-        self.wall = np.mean(ranges[480 : 600])
-
-        self.right_PID(1.0, 1.2, 0.0, 0.4, 'Right')
+        if self.wall=="right":
+            #Right average
+            self.futureL = np.mean(ranges[600: 740])
+            print("future L = {}".format(self.futureL)) ####
+            self.averageL = np.mean(ranges[740 : 900])
+            print("average L = {}".format(self.averageL))
+            #Front average
+            self.wall = np.mean(ranges[480 : 600])
+            self.left_PID(1.0, 1.2, 0.0, 0.4, 'Left')
+        elif self.wall=="left":
+            #Right average
+            self.averageR = np.mean(ranges[180 : 340])
+            print("future R = {}".format(self.futureR))
+            self.futureR = np.mean(ranges[340 : 480])
+            print("average R = {}".format(self.averageR))
+            #Front average
+            self.wall = np.mean(ranges[480 : 600])
+            self.right_PID(1.0, 1.2, 0.0, 0.4, 'Right')
         
     def right_PID(self, maxSpeed, kp, ki, kd, mode):
         print("ENTRANDO A PID")
