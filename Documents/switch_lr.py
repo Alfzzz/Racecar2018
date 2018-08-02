@@ -38,7 +38,7 @@ class ar_switch():
         self.current_time = time.time() #No estpy seguro pero nos puede ayudar en un futuro
         self.prev_time = 0
         
-        global self.wall
+        global self.side_wall
         
     def callback(self,marker):
         self.id = marker.markers[0].id
@@ -46,13 +46,15 @@ class ar_switch():
             if marker.markers.id != None:
                 print(marker.markers[0].id)
                 if marker.markers[0].id == 1:
-                    self.wall="right"               
+                    self.side_wall="right"               
                 elif marker.markers[0].id == 4:
-                    self.wall="left"
+                    self.side_wall="left"
+                else:
+                    pass
     def laser_callback(self,msg):
         
         ranges = msg.ranges
-        if self.wall=="right":
+        if self.side_wall=="left":
             #Right average
             self.futureL = np.mean(ranges[600: 740])
             print("future L = {}".format(self.futureL)) ####
@@ -61,8 +63,8 @@ class ar_switch():
             #Front average
             self.wall = np.mean(ranges[480 : 600])
             self.left_PID(1.0, 1.2, 0.0, 0.4, 'Left')
-        elif self.wall=="left":
-            #Right average
+        elif self.side_wall=="right":
+            #Left average
             self.averageR = np.mean(ranges[180 : 340])
             print("future R = {}".format(self.futureR))
             self.futureR = np.mean(ranges[340 : 480])
