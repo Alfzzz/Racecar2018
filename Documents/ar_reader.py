@@ -10,13 +10,13 @@ def ar_callback(ar_markers):
         ar_id = marker.id
         marker.pose.pose.position.x
         last_id = ar_id
-        print last_id
-    if len(marker.markers) >= 1:
-        for i in range(1, len(marker.markers)):
+    minimum = ar_id
+    if len(ar_markers.markers) >= 1:
+        for i in range(1, len(ar_markers.markers)):
             minimum = ar_markers.markers[0].id
-            if ar_markers.markers[i].pose.x < minimum:
+            if ar_markers.markers[i].pose.pose.position.x < minimum:
                 minimum = ar_markers.markers[i].id
-        print minimum
+    print minimum
 
 if __name__ == "__main__":
     try:
