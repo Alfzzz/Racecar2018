@@ -51,23 +51,21 @@ class ar_switch():
         #Left average
         self.futureL = np.mean(ranges[600: 740])
         self.averageL = np.mean(ranges[740 : 900])
-        if self.state = 0:
+        if self.state == 0:
             print "following right"
             self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
-        if self.state = 1:
+        if self.state == 1:
             print "following left"
             self.PID(1.0, 1.2, 0.0, 0.4, 'Left')
         #3 possible wall followers, Left, Right, LR, Close Line
 
 
-    def callback(self,marker,msg):
+    def callback(self,marker):
         if len(marker.markers) > 0:
-            if marker.markers.id != None:
-                if marker.markers[0].id == 18 or marker.markers[0].id == 4:
-                    self.state = 1
-                    
-                if marker.markers[0].id == 23 or marker.markers[0].id == 7:
-                    self.state = 0
+            if marker.markers[0].id == 18 or marker.markers[0].id == 4:
+                self.state = 1
+            if marker.markers[0].id == 23 or marker.markers[0].id == 7:
+                self.state = 0
 
 
     def PID(self, maxSpeed, kp, ki, kd, mode):
@@ -130,8 +128,8 @@ class ar_switch():
         else:
             self.velCoeff = 1
 
-        print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
-        print("Angle = {}".format(self.output))
+        #print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
+        #print("Angle = {}".format(self.output))
 
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
