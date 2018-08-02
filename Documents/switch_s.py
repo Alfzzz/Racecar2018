@@ -16,7 +16,7 @@ class ar_switch():
     def __init__(self):
         rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.callback, queue_size = 1)
         #::::::::::::::::::::::::::::::::::::: SUBSCRIBERS :::::::::::::::::::::::::::::::::
-        rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.callback)
+        rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
         #::::::::::::::::::::::::::::::::::::: PUBLISHERS ::::::::::::::::::::::::::::::::::
         self.cmd_pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size = 10)
