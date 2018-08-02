@@ -5,7 +5,7 @@ import numpy as np
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
 
-class Follow_Wall_Right():
+class Follow_Wall_Left():
 
     def __init__(self):
         
@@ -43,25 +43,26 @@ class Follow_Wall_Right():
         ranges = msg.ranges
 
         #Right average
-        self.averageR = np.mean(ranges[180 : 340])
-        print("future R = {}".format(self.futureR))
-        self.futureR = np.mean(ranges[340 : 480])
-        print("average R = {}".format(self.averageR))
+        self.futureL = np.mean(ranges[600: 740])
+        print("future L = {}".format(self.futureL)) ####
+        self.averageL = np.mean(ranges[740 : 900])
+        print("average L = {}".format(self.averageL))
         #Front average
         self.wall = np.mean(ranges[480 : 600])
 
-        self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
+        self.PID(1.0, 1.2, 0.0, 0.4, 'Left')
 
         #3 possible wall followers, Left, Right, LR, Close Line
     def PID(self, maxSpeed, kp, ki, kd, mode):
-        print("ENTRANDO A PID")
 
-        if  mode == 'Right':
-            error = self.averageR - self.idealDis
-            dir = -1 
-            if self.futureR >= (2 * self.averageR):
+        print("ENTRANDO A PID")
+        if mode == 'Left':
+            dir = 1
+            error = self.averageL - self.idealDis
+            print(error)
+            if self.futureL >= (2 * self.averageL):
                 self.futCon = - 0.1
-            elif self.futureR <= self.averageR:
+            elif self.futureL <= self.averageL:
                 self.futCon = 0.1
             else:
                 self.futCon = 0
@@ -80,13 +81,13 @@ class Follow_Wall_Right():
 
         self.prev_error = error
         self.prev_time = self.current_time
-'''
+        '''
         if self.futureR >= (2 * self.averageR):
             self.futCon = - 0.1
 
         elif self.futureR <= self.averageR:
             self.futCon = 0.1
-'''
+        '''
         self.output = (prop + integ + deriv + self.futCon) * dir
 
         if abs(self.output) >= 0.34:
@@ -100,10 +101,10 @@ class Follow_Wall_Right():
 
         print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
         print("Angle = {}".format(self.output))
+        
+        print("SALIENDO PID")
 
-        print("SALIENDO DE PID")
         # self.ackermann_cmd_input_callback(AckermannDriveStamped())
-
 
     def ackermann_cmd_input_callback(self, msg):
         msg.drive.speed = self.maxSpeed * self.velCoeff
@@ -112,6 +113,6 @@ class Follow_Wall_Right():
         self.cmd_pub.publish(msg)
         
 if __name__ == "__main__":
-    rospy.init_node("Follow_Wall_Right")
-    node = Follow_Wall_Right()
+    rospy.init_node("Follow_Wall_Left")
+    node = Follow_Wall_Left()
     rospy.spin()
