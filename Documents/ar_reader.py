@@ -6,16 +6,29 @@ from ar_track_alvar_msgs.msg import AlvarMarkers
 AR_TOPIC = "/ar_pose_marker"
 
 def ar_callback(ar_markers):
-    for marker in ar_markers.markers:
-        ar_id = marker.id
-        marker.pose.pose.position.x
-        last_id = ar_id
-    minimum = ar_id
+    #for marker in ar_markers.markers:
+        #ar_id = marker.id
+        #marker.pose.pose.position.y
+        #last_id = ar_id
+    flag = 0
     if len(ar_markers.markers) >= 1:
         for i in range(1, len(ar_markers.markers)):
             minimum = ar_markers.markers[0].id
-            if ar_markers.markers[i].pose.pose.position.x < minimum:
+            if ar_markers.markers[i].pose.pose.position.y < minimum:
                 minimum = ar_markers.markers[i].id
+                flag = 1
+        last_ar = minimum
+    elif len(ar_markers.markers) < 1:
+        minimum = ar_markers.markers[0].id
+        flag = 1
+        last_ar = minimum
+    else:
+        pass
+
+    if flag == 0:
+        minimum = 0
+    else: 
+        minimum = last_ar
     print minimum
 
 if __name__ == "__main__":
