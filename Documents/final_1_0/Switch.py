@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+
 import rospy
 from ar_track_alvar_msgs.msg import AlvarMarkers
 import time
@@ -13,15 +14,16 @@ class ar_switch():
         self.master = 0
 
     def callback(self,marker):
-        if (len(marker.markers) > 0) and marker.markers.id != None:
+        if len(marker.markers) > 0 and marker.markers[0].id != 255:	
             self.master = marker.markers[0].id
             print(self.master)
 
-        if marker.markers[0].id == 4:
-            #right.right()
+
+        if self.master == 19 or self.master == 23:
+            right.right()
             print("Right")
-        elif marker.markers[0].id == 7:
-            #left.left()
+        elif self.master == 18 or self.master == 22:
+            left.left()
             print("Left")
         else:
             pass
