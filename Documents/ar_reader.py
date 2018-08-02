@@ -17,8 +17,8 @@ def ar_callback(ar_markers):
             if ar_markers.markers[i].pose.pose.position.y < minimum:
                 minimum = ar_markers.markers[i].id
                 flag = 1
-        last_ar = minimum
-    elif len(ar_markers.markers) < 1:
+        	last_ar = minimum
+    elif len(ar_markers.markers) == 1:
         minimum = ar_markers.markers[0].id
         flag = 1
         last_ar = minimum
