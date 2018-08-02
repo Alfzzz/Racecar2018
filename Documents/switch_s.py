@@ -36,6 +36,7 @@ class ar_switch():
         self.contours = 0
         self.current_time = time.time() #No estpy seguro pero nos puede ayudar en un futuro
         self.prev_time = 0
+        self.state = 0
 
 
     def laser_callback(self,msg):
@@ -50,33 +51,23 @@ class ar_switch():
         #Left average
         self.futureL = np.mean(ranges[600: 740])
         self.averageL = np.mean(ranges[740 : 900])
-
+        if self.state = 0:
+            print "following right"
+            self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
+        if self.state = 1:
+            print "following left"
+            self.PID(1.0, 1.2, 0.0, 0.4, 'Left')
         #3 possible wall followers, Left, Right, LR, Close Line
 
 
     def callback(self,marker,msg):
         if len(marker.markers) > 0:
             if marker.markers.id != None:
-                if marker.markers[0].id == 18 or marker.markers[0].id == 22:
-                    print "following left wall"
-                    self.PID(1.0, 1.2, 0.0, 0.4, 'Left')
-                    msg.drive.speed = self.maxSpeed * self.velCoeff
-                    msg.drive.steering_angle = self.output
-                    msg.drive.steering_angle_velocity = 1
-                    self.cmd_pub.publish(msg)
-                if marker.markers[0].id == 23 or marker.markers[0].id == 19:
-                    print "following right wall"
-                    self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
-                    msg.drive.speed = self.maxSpeed * self.velCoeff
-                    msg.drive.steering_angle = self.output
-                    msg.drive.steering_angle_velocity = 1
-                    self.cmd_pub.publish(msg)
-                if marker.markers[0].id == None:
-                    self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
-                    msg.drive.speed = self.maxSpeed * self.velCoeff
-                    msg.drive.steering_angle = self.output
-                    msg.drive.steering_angle_velocity = 1
-                    self.cmd_pub.publish(msg)
+                if marker.markers[0].id == 18 or marker.markers[0].id == 4:
+                    self.state = 1
+                    
+                if marker.markers[0].id == 23 or marker.markers[0].id == 7:
+                    self.state = 0
 
 
     def PID(self, maxSpeed, kp, ki, kd, mode):
@@ -144,11 +135,11 @@ class ar_switch():
 
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
-    #def ackermann_cmd_input_callback(self, msg):
-        #msg.drive.speed = self.maxSpeed * self.velCoeff
-        #msg.drive.steering_angle = self.output
-        #msg.drive.steering_angle_velocity = 1
-        #self.cmd_pub.publish(msg)
+    def ackermann_cmd_input_callback(self, msg):
+        msg.drive.speed = self.maxSpeed * self.velCoeff
+        msg.drive.steering_angle = self.output
+        msg.drive.steering_angle_velocity = 0.8
+        self.cmd_pub.publish(msg)
 
 
 if __name__ == "__main__":
