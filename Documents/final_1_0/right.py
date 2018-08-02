@@ -1,11 +1,11 @@
-!/usr/bin/env python
+#!/usr/bin/env python
 import rospy
 import time
 import numpy as np
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
 
-class right():
+class Follow_Wall_Right():
 
     def __init__(self):
         
@@ -14,7 +14,7 @@ class right():
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
  
         #::::::::::::::::::::::::::::::::::::: PUBLISHERS ::::::::::::::::::::::::::::::::::
-        self.cmd_pub = rospy.Publisher('/ackermann_cmd_mux/input/default', AckermannDriveStamped, queue_size = 10)
+        self.cmd_pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size = 10)
 
 
         self.maxSpeed = 1
@@ -80,13 +80,13 @@ class right():
 
         self.prev_error = error
         self.prev_time = self.current_time
-
+        '''
         if self.futureR >= (2 * self.averageR):
             self.futCon = - 0.1
 
         elif self.futureR <= self.averageR:
             self.futCon = 0.1
-
+        '''
         self.output = (prop + integ + deriv + self.futCon) * dir
 
         if abs(self.output) >= 0.34:
@@ -98,12 +98,11 @@ class right():
         else:
             self.velCoeff = 1
 
-        #print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
-        #print("Angle = {}".format(self.output))
+        print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
+        print("Angle = {}".format(self.output))
 
-        #print("SALIENDO DE PID")
-	print("right")
-        self.ackermann_cmd_input_callback(AckermannDriveStamped())
+        print("SALIENDO DE PID")
+        # self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
 
     def ackermann_cmd_input_callback(self, msg):
@@ -112,8 +111,7 @@ class right():
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
         
-        
 if __name__ == "__main__":
-    rospy.init_node("right", anonymous = True)
-    node = right()
+    rospy.init_node("Follow_Wall_Right")
+    node = Follow_Wall_Right()
     rospy.spin()
