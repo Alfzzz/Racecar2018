@@ -21,6 +21,7 @@ class Potential_Field():
         k= .5 
         fx1 = []
         fy1 = []
+        self.angle = []
         for i in range(len(msg.ranges)):
           x = msg.ranges[i]*np.cos(i*msg.angle_increment)
           y = msg.ranges[i]*np.sin(i*msg.angle_increment)
@@ -34,18 +35,19 @@ class Potential_Field():
           fy1.append(ya)
           fy1.append(yr)
         fx = sum(fx1)
-        fy = sum(fy1)
-        print fx
-        print fy
-        self.angle = np.arctan((fy/fx))
-        if abs(self.angle)>(np.pi/3):
-         self.angle = (np.pi/3)
-        print self.angle
+        fy = sum(fy1) 
+        self.angle1 = np.arctan(fy/fx)
+        self.angle.append(self.angle1)
+        #if abs(self.angle1)>(np.pi/3):
+         #self.angle.append((np.pi/3)) 
+        print sum(self.angle)/len(self.angle)
+        if len(self.angle)>20:
+         self.angle.pop(0)
         self.ackermann_callback(AckermannDriveStamped())
   
     def ackermann_callback(self, msg):
-        msg.drive.speed = 0.7 
-        msg.drive.steering_angle = self.angle
+        msg.drive.speed = 1.0
+        msg.drive.steering_angle = sum(self.angle)/len(self.angle)
         msg.drive.steering_angle_velocity = 1
         self.publish.publish(msg)
 
