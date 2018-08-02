@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# Written by Leo Belyi
 
 import rospy
 from ar_track_alvar_msgs.msg import AlvarMarkers
@@ -9,8 +8,15 @@ AR_TOPIC = "/ar_pose_marker"
 def ar_callback(ar_markers):
     for marker in ar_markers.markers:
         ar_id = marker.id
-        print marker.pose.pose.x
-        print ar_id
+        marker.pose.pose.position.x
+        last_id = ar_id
+        print last_id
+    if len(marker.markers) >= 1:
+        for i in range(1, len(marker.markers)):
+            minimum = ar_markers.markers[0].id
+            if ar_markers.markers[i].pose.x < minimum:
+                minimum = ar_markers.markers[i].id
+        print minimum
 
 if __name__ == "__main__":
     try:
