@@ -17,10 +17,10 @@ class ar_switch():
             self.master = marker.markers[0].id
             print(self.master)
 
-        if marker.markers[0].id == 1:
+        if marker.markers[0].id == 4:
             #right.right()
             print("Right")
-        elif marker.markers[0].id == 4:
+        elif marker.markers[0].id == 7:
             #left.left()
             print("Left")
         else:
