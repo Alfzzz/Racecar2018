@@ -11,14 +11,14 @@ class Potential_Field_Controller():
         self.x = 0
         self.y = 0
         self.k = 0.1
-        self.ks = 0.1
+        self.ks = 0.01
 
         rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
 
         self.cmd_pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size = 10)
 
-    def translate(self,value, leftMin, leftMax, rightMin, rightMax):
+    def translate(self, value, leftMin, leftMax, rightMin, rightMax):
         # Figure out how 'wide' each range is
         leftSpan = leftMax - leftMin
         rightSpan = rightMax - rightMin
@@ -42,18 +42,19 @@ class Potential_Field_Controller():
         return result
 
     def mapping(self, temp):
-        if temp >= np.pi-0.34 and temp <= np.pi+0.34:
-            self.steering = self.translate(temp, np.pi-0.34, np.pi+0.34, -0.34, 0.34)
-        elif temp > np.pi+0.34 and temp < (3*np.pi)/2:
+        self.steering = None
+        if temp >= (np.pi/2)-0.34 and temp <= (np.pi/2)+0.34:
+            self.steering = self.translate(temp, (np.pi/2)-0.34, (np.pi/2)+0.34, -0.34, 0.34)
+        elif temp > (np.pi/2)+0.34 and temp < (3*np.pi)/2:  
             self.steering =  1
-        elif temp >= (3*np.pi)/2 and temp < np.pi-0.34:
+        elif temp >= (3*np.pi)/2 and temp < (np.pi/2)-0.34:
             self.steering = -1
         return self.steering
 
 
             
     def ackermann_cmd_input_callback(self,msg):
-	self.speed = self.ks * (self.x**2+self.y**2)**1/2
+	    self.speed = self.ks * (self.x**2+self.y**2)**1/2
         self.phi = np.arctan2(self.y,self.x)
         self.steering = self.mapping(self.phi)
 	
@@ -61,7 +62,8 @@ class Potential_Field_Controller():
         msg.drive.steering_angle = self.steering
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
-        print self.phi
+        print self.steering
+        print self.speed
         
 if __name__ == "__main__":
     rospy.init_node("Potential_Field_Controller")
