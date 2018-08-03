@@ -108,7 +108,7 @@ class Follow_Wall():
         self.futureL = np.mean(ranges[600: 740])
         self.averageL = np.mean(ranges[740 : 900])
 
-        self.PID(1.0, 1.2, 0.0, 0.4, 'Close')
+        self.PID(1.0, 1.2, 0.0, 0.4, mode)
 
         #3 possible wall followers, Left, Right, LR, Close Line
     def PID(self, maxSpeed, kp, ki, kd, mode):
