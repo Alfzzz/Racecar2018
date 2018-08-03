@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import rospy
+from ar_track_alvar_msgs.msg import AlvarMarkers
+
+class Find_AR():
+
+    def __init__ (self):
+
+        rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.callback, queue_size = 10)
+        self.last_ar = None
+    def ar_callback(ar_markers):
+
+        if len(ar_markers.markers) > 1:
+            for i in range(1, len(ar_markers.markers)):
+                minimum = ar_markers.markers[0].id
+                if ar_markers.markers[i].pose.pose.position.y > minimum:
+                    minimum = ar_markers.markers[i].id
+            flag = 1
+        elif len(ar_markers.markers) == 1:
+            minimum = ar_markers.markers[0].id
+            flag = 1
+        else:
+            pass
+
+        if flag == None:
+            self.last_ar = 0
+        else:
+            if minimum < 50:
+                self.last_ar = minimum
+    
+    def getId ():
+        return self.last_ar
+
+if __name__ == "__main__":
+    rospy.init_node("Find_AR")
+    node = Find_AR()
+rospy.spin()
