@@ -6,8 +6,6 @@ import numpy as np
 from ackermann_msgs.msg import AckermannDriveStamped
 from sensor_msgs.msg import LaserScan
 from ar_track_alvar_msgs.msg import AlvarMarkers
-#import right
-#import left
 
 class Follow_Wall():
 
@@ -31,7 +29,7 @@ class Follow_Wall():
 
         self.prev_error = 0
         
-        self.safety = .3
+        self.safety = 0.3
 
         self.averageL = 0
         self.futureL = 0
@@ -40,15 +38,14 @@ class Follow_Wall():
 
         self.averageR = 0
         self.futureR = 0
-        self.idealDis = 0.5 # En el caso de L or R
-
+        self.idealDis = 0
         self.output = 0
 
         #:::::::::::::::::::::::::::::::::::: LINE :::::::::::::::::::::::::::::::::::::::::
 
         self.contours = 0
 
-        self.current_time = time.time() #No estpy seguro pero nos puede ayudar en un futuro
+        self.current_time = time.time()
         self.prev_time = 0
         self.flag = None
         self.last_ar = None
@@ -68,7 +65,7 @@ class Follow_Wall():
         self.averageL = np.mean(ranges[740 : 900])
 
 
-        #3 possible wall followers, Left, Right, LR, Close Line
+        #3 possible wall followers, Left, Right and LR
     def ar_callback(self,ar_markers):
 
         if len(ar_markers.markers) > 1:
@@ -93,17 +90,16 @@ class Follow_Wall():
 
         print (self.last_ar)
 
-
         if self.last_ar == 20 or self.last_ar == 18 or self.last_ar == 23 or self.last_ar == 17:
-            self.PID(0.6, 1.2, 0.0, 0.4, 'Right')
-
+            self.PID(0.6, 1.2, 0.0, 0.4, 'Right', 0.5)
         elif self.last_ar == 19:
-            self.PID(0.6, 1.2, 0.0, 0.4, 'Left')
+            self.PID(0.6, 1.2, 0.0, 0.4, 'Left', 0.5)
         elif self.last_ar == 20:
-            self.PID(0.6, 1.2, 0.0, 0.4, 'LR')
+            self.PID(0.6, 1.2, 0.0, 0.4, 'Right', 1.2)
 
-    def PID(self, maxSpeed, kp, ki, kd, mode):
+    def PID(self, maxSpeed, kp, ki, kd, mode, idealDis):
         dir = 1
+        self.idealDis = idealDis
         if  mode == 'Right':
             error = self.averageR - self.idealDis
             dir = -1 
@@ -114,7 +110,7 @@ class Follow_Wall():
             error = (((self.averageL + self.averageR) / 2) - self.idealDis)
 
         self.maxSpeed = maxSpeed
-        # Improve and future
+        # FutureL and FutureR
         
         self.current_time = time.time()
 
@@ -130,7 +126,7 @@ class Follow_Wall():
         self.prev_error = error
         self.prev_time = self.current_time
         
-        self.output = (prop + integ + deriv ) * dir
+        self.output = (prop + integ + deriv) * dir
 
         if abs(self.output) >= 0.34:
             self.velCoeff = 0.8
@@ -144,10 +140,9 @@ class Follow_Wall():
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
     def ackermann_cmd_input_callback(self, msg):
-        msg.drive.speed = self.maxSpeed * self.velCoeff * (self.wall/self.safety) 
+        msg.drive.speed = self.maxSpeed * self.velCoeff * (self.wall / self.safety) 
         if  msg.drive.speed > 2:
-         msg.drive.speed = 2
-        print msg.drive.speed 
+            msg.drive.speed = 2
         msg.drive.steering_angle = self.output
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
@@ -155,4 +150,4 @@ class Follow_Wall():
 if __name__ == "__main__":
     rospy.init_node("Follow_Wall")
     node = Follow_Wall()
-    rospy.spin()
+rospy.spin()
