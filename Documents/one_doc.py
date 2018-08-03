@@ -1,4 +1,3 @@
-
 #!/usr/bin/python
 
 import rospy
@@ -59,16 +58,12 @@ class Follow_Wall():
 
         #Right average
         self.averageR = np.mean(ranges[180 : 340])
-        #print("future R = {}".format(self.futureR))
         self.futureR = np.mean(ranges[340 : 480])
-        #print("average R = {}".format(self.averageR))
         #Front average
         self.wall = np.mean(ranges[480 : 600])
         #Left average
         self.futureL = np.mean(ranges[600: 740])
-        #print("future L = {}".format(self.futureL)) ####
         self.averageL = np.mean(ranges[740 : 900])
-        #print("average L = {}".format(self.averageL))
 
 
         #3 possible wall followers, Left, Right, LR, Close Line
@@ -97,11 +92,13 @@ class Follow_Wall():
         print (self.last_ar)
 
 
-        if self.last_ar == 1 or self.last_ar == 7:
-            self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
+        if self.last_ar == 20 or self.last_ar == 18:
+            self.PID(0.6, 1.2, 0.0, 0.4, 'Right')
 
-        elif self.last_ar == 18 or self.last_ar == 4:
-            self.PID(1.0, 1.2, 0.0, 0.4, 'Left')
+        elif self.last_ar == 17 or self.last_ar == 23:
+            self.PID(0.6, 1.2, 0.0, 0.4, 'Left')
+        elif self.last ar == 19:
+            self.PID(0.6, 1.2, 0.0, 0.4, 'LR')
 
     def PID(self, maxSpeed, kp, ki, kd, mode):
         dir = 1
@@ -113,15 +110,6 @@ class Follow_Wall():
             print(error)
         elif mode == 'LR':
             error = (((self.averageL + self.averageR) / 2) - self.idealDis)
-       
-
-
-        '''elif mode == 'Close':
-            if self.averageR < self.averageL:
-                error = self.averageR - self.idealDis
-                dir = -1 
-            else:
-                error = self.averageL - self.idealDis'''
 
         self.maxSpeed = maxSpeed
         # Improve and future
@@ -142,18 +130,14 @@ class Follow_Wall():
         
         self.output = (prop + integ + deriv ) * dir
 
-        #if abs(self.output) >= 0.34:
-            #self.velCoeff = 0.7
+        if abs(self.output) >= 0.34:
+            self.velCoeff = 0.8
 
-        #elif abs(self.output) >= 0.25:
-            #self.velCoeff = 0.9
+        elif abs(self.output) >= 0.25:
+            self.velCoeff = 0.9
 
-        #else:
-            #self.velCoeff = 1
-  
-
-        #print("P = {} I = {} D = {}".format(round(prop, 4), round(integ, 4), round(deriv, 4)))
-        #print("Angle = {}".format(self.output))
+        else:
+            self.velCoeff = 1
 
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
@@ -167,9 +151,3 @@ if __name__ == "__main__":
     rospy.init_node("Follow_Wall")
     node = Follow_Wall()
     rospy.spin()
-
-
-
-
-
-
