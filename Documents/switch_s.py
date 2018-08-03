@@ -79,6 +79,7 @@ class Switch():
             #Front average
             self.wall = np.mean(ranges[480 : 600])
             self.PID(1.0, 1.2, 0.0, 0.4, 'Left')
+            print "following left"
 
         if last_ar == 18:
             ranges = msg.ranges
@@ -90,6 +91,7 @@ class Switch():
             #Front average
             self.wall = np.mean(ranges[480 : 600])
             self.PID(1.0, 1.2, 0.0, 0.4, 'Right')
+            print "following right"
 
     def PID(self, maxSpeed, kp, ki, kd, mode):
         print("ENTRANDO A PID")
