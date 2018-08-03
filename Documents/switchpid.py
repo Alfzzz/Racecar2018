@@ -23,13 +23,15 @@ class Follow_Wall():
         self.cmd_pub = rospy.Publisher('/ackermann_cmd_mux/input/default', AckermannDriveStamped, queue_size = 10)
 
 
-        self.maxSpeed = 1
+        self.maxSpeed = 1.5
 
         #::::::::::::::::::::::::::::::::::::: WALL FOLLOWER :::::::::::::::::::::::::::::::
         self.velCoeff = 1
         #self.futCon = 0
 
         self.prev_error = 0
+        
+        self.safety = .3
 
         self.averageL = 0
         self.futureL = 0
@@ -72,7 +74,7 @@ class Follow_Wall():
         if len(ar_markers.markers) > 1:
             for i in range(1, len(ar_markers.markers)):
                 self.minimum = ar_markers.markers[0].id
-                if ar_markers.markers[i].pose.pose.position.y > self.minimum:
+                if ar_markers.markers[i].pose.pose.position.z < self.minimum:
                     self.minimum = ar_markers.markers[i].id
             self.flag = 1
         elif len(ar_markers.markers) == 1:
@@ -92,12 +94,12 @@ class Follow_Wall():
         print (self.last_ar)
 
 
-        if self.last_ar == 20 or self.last_ar == 18:
+        if self.last_ar == 20 or self.last_ar == 18 or self.last_ar == 23 or self.last_ar == 17:
             self.PID(0.6, 1.2, 0.0, 0.4, 'Right')
 
-        elif self.last_ar == 17 or self.last_ar == 23:
+        elif self.last_ar == 19:
             self.PID(0.6, 1.2, 0.0, 0.4, 'Left')
-        elif self.last ar == 19:
+        elif self.last_ar == 20:
             self.PID(0.6, 1.2, 0.0, 0.4, 'LR')
 
     def PID(self, maxSpeed, kp, ki, kd, mode):
@@ -142,7 +144,10 @@ class Follow_Wall():
         self.ackermann_cmd_input_callback(AckermannDriveStamped())
 
     def ackermann_cmd_input_callback(self, msg):
-        msg.drive.speed = self.maxSpeed * self.velCoeff
+        msg.drive.speed = self.maxSpeed * self.velCoeff * (self.wall/self.safety) 
+        if  msg.drive.speed > 2:
+         msg.drive.speed = 2
+        print msg.drive.speed 
         msg.drive.steering_angle = self.output
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
