@@ -31,11 +31,11 @@ class Follow_Wall():
 
         self.averageL = 0
         self.futureL = 0
+        self.averageR = 0
+        self.futureR = 0
 
         self.wall = 0
 
-        self.averageR = 0
-        self.futureR = 0
         self.idealDis = 0
         self.output = 0
 
@@ -88,12 +88,15 @@ class Follow_Wall():
 
         print (self.last_ar)
 
-        if self.last_ar == 20 or self.last_ar == 18 or self.last_ar == 23 or self.last_ar == 17:
+        if self.last_ar == 2 or self.last_ar == 9 or self.last_ar == 23 or self.last_ar == 17:
             self.PID(0.6, 1.2, 0.0, 0.4, 'Right', 0.5)
-        elif self.last_ar == 19:
+            print("R")
+        elif self.last_ar == 3:
             self.PID(0.6, 1.2, 0.0, 0.4, 'Left', 0.5)
-        elif self.last_ar == 20:
-            self.PID(0.6, 1.2, 0.0, 0.4, 'Right', 1.2)
+            print("L")
+        elif self.last_ar == 1 or self.last_ar == 4 or self.last_ar == 5:
+            self.PID(1.5, 1.2, 0.0, 0.4, 'LR', 1.2)
+            print("LR")
     
     def moving_average(angle):
     
@@ -112,7 +115,6 @@ class Follow_Wall():
             dir = -1 
         elif mode == 'Left':
             error = self.averageL - self.idealDis
-            print(error)
         elif mode == 'LR':
             error = (((self.averageL + self.averageR) / 2) - self.idealDis)
 
@@ -135,7 +137,7 @@ class Follow_Wall():
         
         self.output = (prop + integ + deriv) * dir
 
-        if (abs(self.output) >= 0.34) or self.wall < 0.65:
+        if abs(self.output) >= 0.34 or self.wall < 0.65:
 
             self.output = 0.34 * dir
             self.velCoeff = 0.8
