@@ -14,7 +14,7 @@ class Follow_Wall():
         #::::::::::::::::::::::::::::::::::::: SUBSCRIBERS :::::::::::::::::::::::::::::::::
         rospy.Subscriber("ackermann_cmd_mux/output", AckermannDriveStamped,self.ackermann_cmd_input_callback)
         rospy.Subscriber("/scan", LaserScan, self.laser_callback)
-        rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.ar_callback, queue_size = 1)
+        rospy.Subscriber('ar_pose_marker', AlvarMarkers, self.ar_callback, queue_size = 10)
 
  
         #::::::::::::::::::::::::::::::::::::: PUBLISHERS ::::::::::::::::::::::::::::::::::
@@ -22,7 +22,6 @@ class Follow_Wall():
 
 
         self.maxSpeed = 1.5
-
         #::::::::::::::::::::::::::::::::::::: WALL FOLLOWER :::::::::::::::::::::::::::::::
         self.velCoeff = 1
         #self.futCon = 0
@@ -41,9 +40,8 @@ class Follow_Wall():
         self.idealDis = 0
         self.output = 0
 
-        #:::::::::::::::::::::::::::::::::::: LINE :::::::::::::::::::::::::::::::::::::::::
-
-        self.contours = 0
+        #:::::::::::::::::::::::::::::::::::: MOVING AVERAGE:::::::::::::::::::::::::::::::::
+        self.array_average = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] # 20 values
 
         self.current_time = time.time()
         self.prev_time = 0
@@ -65,7 +63,7 @@ class Follow_Wall():
         self.averageL = np.mean(ranges[740 : 900])
 
 
-        #3 possible wall followers, Left, Right and LR
+    # 3 possible wall followers, Left, Right and LR
     def ar_callback(self,ar_markers):
 
         if len(ar_markers.markers) > 1:
@@ -74,6 +72,7 @@ class Follow_Wall():
                 if ar_markers.markers[i].pose.pose.position.z < self.minimum:
                     self.minimum = ar_markers.markers[i].id
             self.flag = 1
+
         elif len(ar_markers.markers) == 1:
             self.minimum = ar_markers.markers[0].id
             self.flag = 1
@@ -96,6 +95,15 @@ class Follow_Wall():
             self.PID(0.6, 1.2, 0.0, 0.4, 'Left', 0.5)
         elif self.last_ar == 20:
             self.PID(0.6, 1.2, 0.0, 0.4, 'Right', 1.2)
+    
+    def moving_average(angle):
+    
+        self.array_average.insert(0,angle)
+        del self.array_average [-1]
+        print("Promedio = {}".format(np.mean(self.array_average)))
+        # print array_average
+        return np.mean(self.array_average)
+
 
     def PID(self, maxSpeed, kp, ki, kd, mode, idealDis):
         dir = 1
@@ -129,6 +137,7 @@ class Follow_Wall():
         self.output = (prop + integ + deriv) * dir
 
         if abs(self.output) >= 0.34:
+            self.output = 0.34 * dir
             self.velCoeff = 0.8
 
         elif abs(self.output) >= 0.25:
@@ -143,7 +152,7 @@ class Follow_Wall():
         msg.drive.speed = self.maxSpeed * self.velCoeff * (self.wall / self.safety) 
         if  msg.drive.speed > 2:
             msg.drive.speed = 2
-        msg.drive.steering_angle = self.output
+        msg.drive.steering_angle = self.moving_average(self.output)
         msg.drive.steering_angle_velocity = 1
         self.cmd_pub.publish(msg)
         
