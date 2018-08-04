@@ -20,7 +20,7 @@ class Start():
         self.msg=msg
         img = self.bridge.imgmsg_to_cv2(self.msg)
         cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
-        thresh = cv2.inRange(readImage, np.array([200, 245, 210]), np.array([250, 255, 230]))
+        thresh = cv2.inRange(readImage, np.array([210, 245, 210]), np.array([250, 255, 230]))
         im2, contours, heirarchy = cv2.findContours(hsl, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         areas = [cv2.contourArea(c) for c in contours]
         try:
@@ -28,8 +28,7 @@ class Start():
             rospy.loginfo(areas[max_index])
             if areas[max_index] < 0.1:
                 self.state_light = True
-            else:
-                self.state_light= True
+                print "Go"
         except ValueError:
             self.state_light = False
 
