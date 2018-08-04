@@ -24,7 +24,6 @@ class Follow_Wall():
         self.maxSpeed = 1.5
         #::::::::::::::::::::::::::::::::::::: WALL FOLLOWER :::::::::::::::::::::::::::::::
         self.velCoeff = 1
-        #self.futCon = 0
 
         self.prev_error = 0
         
@@ -136,7 +135,8 @@ class Follow_Wall():
         
         self.output = (prop + integ + deriv) * dir
 
-        if abs(self.output) >= 0.34:
+        if (abs(self.output) >= 0.34) or self.wall < 0.65:
+
             self.output = 0.34 * dir
             self.velCoeff = 0.8
 
