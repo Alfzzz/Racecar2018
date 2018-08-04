@@ -38,6 +38,9 @@ class Follow_Wall_Right():
 
         self.current_time = time.time() #No estpy seguro pero nos puede ayudar en un futuro
         self.prev_time = 0
+    
+    def rightw(self):
+	self.laser_callback()
     def laser_callback(self,msg):
         
         ranges = msg.ranges
