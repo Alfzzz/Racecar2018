@@ -70,7 +70,7 @@ class Follow_Wall():
         self.averageL = np.mean(ranges[740 : 900])
         print("average L = {}".format(self.averageL))
 	
-	self.averageF = np.mean(ranges[500 : 600])
+	    self.averageF = np.mean(ranges[500 : 600])
         print("average F = {}".format(self.averageF))
 
 
